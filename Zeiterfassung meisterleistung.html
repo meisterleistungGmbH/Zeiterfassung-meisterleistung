@@ -1,0 +1,2383 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zeiterfassung meisterleistung</title>
+<style>
+:root {
+  --primary:#2563eb; --primary-dark:#1d4ed8; --primary-light:#eff6ff;
+  --success:#16a34a; --success-light:#f0fdf4;
+  --danger:#dc2626;  --danger-light:#fef2f2;
+  --warning:#d97706; --warning-light:#fffbeb;
+  --bg:#f8fafc; --white:#fff; --border:#e2e8f0;
+  --text:#1e293b; --muted:#64748b;
+  --r:8px;
+  --sh:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --sh2:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+.hdr{background:var(--primary);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh2);flex-wrap:wrap}
+.hdr h1{font-size:19px;font-weight:700}
+.hdr p{font-size:12px;opacity:.85;margin-top:2px}
+.hdr-r{text-align:right;font-size:12px;opacity:.85;line-height:1.6}
+@media (max-width:600px){.hdr{flex-direction:column;align-items:flex-start;gap:6px}.hdr-r{text-align:left}}
+.tabs{background:var(--white);border-bottom:1px solid var(--border);padding:0 12px;display:flex;flex-wrap:wrap}
+.tab{padding:11px 12px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;user-select:none}
+.tab:hover{color:var(--primary)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.main{padding:16px 12px;max-width:1600px;margin:0 auto}
+.tc{display:none}.tc.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--white);border-radius:var(--r);padding:14px 14px;box-shadow:var(--sh);border:1px solid var(--border)}
+.card-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.card-val{font-size:23px;font-weight:800;line-height:1}
+.card-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.cv-pos{color:var(--success)}.cv-neg{color:var(--danger)}.cv-blue{color:var(--primary)}.cv-warn{color:var(--warning)}
+.mnav{display:flex;align-items:center;justify-content:space-between;background:var(--white);padding:9px 12px;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.mnav h2{font-size:16px;font-weight:700}
+.mnav-btns{display:flex;gap:6px;align-items:center}
+.btn{padding:7px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:13px;font-weight:500;color:var(--text);transition:all .15s}
+.btn:hover{background:var(--bg);border-color:#94a3b8}
+.btn-p{background:var(--primary);color:#fff;border-color:var(--primary)}.btn-p:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+.tw{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden}
+.tscroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:950px}
+thead th{background:#f1f5f9;padding:5px 6px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+thead th.tc{text-align:center}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8fafc !important}
+tbody td{padding:4px 6px;vertical-align:middle}
+.row-we{background:#f8fafc}
+.row-hol{background:#fefce8}
+.row-vac{background:#f0fdf4}
+.row-sick{background:#fff1f2}
+.row-today{background:#eff6ff !important}
+.row-comp{background:#faf5ff}
+.ti{width:74px;padding:3px 4px;border:1px solid var(--border);border-radius:4px;font-size:12px;text-align:center;font-family:'Courier New',monospace;transition:border-color .15s}
+.ti:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.2)}
+.ti:disabled{background:#f1f5f9;color:var(--muted);cursor:not-allowed}
+.pi{width:60px}
+.ni{width:150px;padding:3px 4px;border:1px solid var(--border);border-radius:4px;font-size:12px}
+.ni:focus{outline:none;border-color:var(--primary)}
+.ts{padding:3px 4px;border:1px solid var(--border);border-radius:4px;font-size:12px;background:#fff;cursor:pointer;max-width:150px}
+.ts:focus{outline:none;border-color:var(--primary)}
+.sel-small{max-width:150px}
+.d{font-weight:700;font-family:'Courier New',monospace;font-size:12px}
+.dp{color:var(--success)}.dn{color:var(--danger)}.dz{color:var(--muted)}
+.cu{font-family:'Courier New',monospace;font-size:12px}
+.cup{color:var(--success)}.cun{color:var(--danger)}
+.tfoot-r td{padding:7px 6px;background:#f1f5f9;border-top:2px solid var(--border);font-weight:700}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin-top:10px;padding:7px 10px;background:var(--white);border:1px solid var(--border);border-radius:var(--r)}
+.li{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.ld{width:13px;height:13px;border-radius:3px;flex-shrink:0}
+.yt td,.yt th{text-align:center}
+.yt td:first-child,.yt th:first-child{text-align:left}
+.yt tbody tr{cursor:pointer}
+.yt tbody tr:hover td{background:#f0f9ff}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.sc{background:var(--white);border-radius:var(--r);padding:14px;border:1px solid var(--border);box-shadow:var(--sh)}
+.sc h3{font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.fg{margin-bottom:10px}
+.fg label{display:block;font-size:13px;font-weight:500;margin-bottom:4px}
+.fg input,.fg select{width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;transition:border-color .15s}
+.fg input:focus,.fg select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.2)}
+.fh{font-size:11px;color:var(--muted);margin-top:3px}
+.cbg{display:flex;gap:6px;flex-wrap:wrap}
+.dcb{display:flex;align-items:center;gap:4px;padding:4px 7px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;user-select:none}
+.dcb input{width:auto;margin:0}
+.dcb.ck{background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
+.wd-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;font-size:11px}
+.wd-grid div{display:flex;flex-direction:column;gap:3px}
+.wd-grid span{font-weight:600;font-size:11px}
+.wd-grid input{padding:3px 3px;font-size:11px;text-align:center;border-radius:4px;border:1px solid var(--border);}
+.stitle{font-size:16px;font-weight:700;margin-bottom:12px}
+.mono{font-family:'Courier New',monospace}
+.tc-c{text-align:center}
+.mt2{margin-top:8px}.mt3{margin-top:14px}.mb3{margin-bottom:14px}
+#saved-ok{display:none;margin-left:10px;color:var(--success);font-size:13px;font-weight:500}
+@media print{
+  .hdr,.tabs,.mnav-btns,.legend,.no-print{display:none!important}
+  .main{padding:0}.tw{box-shadow:none;border:1px solid #ccc}
+  body{background:#fff}
+}
+</style>
+
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+
+</head>
+<body>
+
+<div id="login-overlay" style="display:flex;position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;padding:40px;max-width:380px;
+    width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)">
+    <div style="font-size:44px;margin-bottom:12px">⏱</div>
+    <h2 style="font-size:20px;margin-bottom:8px;color:#1e293b">Arbeitszeiterfassung</h2>
+    <p style="color:#64748b;font-size:13px;margin-bottom:28px">
+      meisterleistung GmbH<br>Bitte mit Microsoft 365 anmelden.
+    </p>
+    <button onclick="msalLogin()" style="background:#2563eb;color:#fff;border:none;
+      padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;
+      cursor:pointer;width:100%">
+      Mit Microsoft 365 anmelden
+    </button>
+    <p id="login-error" style="color:#dc2626;font-size:12px;
+      margin-top:12px;display:none"></p>
+  </div>
+</div>
+
+<div class="hdr">
+  <div>
+    <h1>⏱ Arbeitszeiterfassung</h1>
+    <p>meisterleistung GmbH</p>
+  </div>
+  <div class="hdr-r">
+    <div id="hdr-name"></div>
+    <div id="hdr-date">Fr., 03.07.2026</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('monat')">📅 Monatsübersicht</div>
+  <div class="tab" onclick="switchTab('jahr')">📊 Jahresübersicht</div>
+  <div class="tab" onclick="switchTab('settings')">⚙️ Einstellungen</div>
+</div>
+
+<div class="main">
+
+<!-- ===== MONAT ===== -->
+<div id="tc-monat" class="tc active">
+  <div class="cards" id="dash-cards">
+    <div class="card"><div class="card-lbl">Überstunden Monat</div><div class="card-val cv-blue" id="c-ue-mon">0:00</div><div class="card-sub" id="c-ue-mon-s">Juli 2026</div></div>
+    <div class="card"><div class="card-lbl">Bisherige Überstunden</div><div class="card-val cv-blue" id="c-ue-ges">0:00</div><div class="card-sub">Saldo Vormonate</div></div>
+    <div class="card"><div class="card-lbl">Urlaub</div><div class="card-val cv-blue" id="c-url">0 / 30</div><div class="card-sub" id="c-url-s">30 verbleibend</div></div>
+    <div class="card"><div class="card-lbl">Kranktage Monat</div><div class="card-val cv-blue" id="c-krank">0</div><div class="card-sub" id="c-krank-s">0 im Jahr</div></div>
+    <div class="card"><div class="card-lbl">Homeoffice Monat</div><div class="card-val cv-blue" id="c-ho">0</div><div class="card-sub">Tage</div></div>
+    <div class="card"><div class="card-lbl">Ist / Soll Monat</div><div class="card-val cv-blue" id="c-ist">0:00</div><div class="card-sub" id="c-soll-s">Soll: 0:00</div></div>
+    <div class="card"><div class="card-lbl">Verpflegung Monat</div><div class="card-val cv-blue" id="c-verpf-mon">0,00 €</div><div class="card-sub">Verpflegungsmehraufwand</div></div>
+    <div class="card"><div class="card-lbl">Fahrtkosten Monat</div><div class="card-val cv-blue" id="c-km-mon">0,00 €</div><div class="card-sub">Privater PKW</div></div>
+  </div>
+
+  <div class="mnav">
+    <div class="mnav-btns no-print">
+      <button class="btn" onclick="changeMonth(-1)">← Vormonat</button>
+      <button class="btn" onclick="goToday()">Heute</button>
+    </div>
+    <h2 id="mon-title">Juli 2026</h2>
+    <div class="mnav-btns no-print">
+      <button class="btn" onclick="window.print()">🖨️ Drucken</button>
+      <button class="btn" onclick="changeMonth(1)">Nächster Monat →</button>
+    </div>
+  </div>
+
+  <div class="tw">
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:88px">Datum</th>
+            <th style="width:60px">Wochentag</th>
+            <th style="width:140px">Tagestyp</th>
+            <th style="width:78px">Startzeit</th>
+            <th style="width:78px">Endzeit</th>
+            <th style="width:60px">Pause</th>
+            <th style="width:90px">IST-AZ</th>
+            <th style="width:90px">SOLL-AZ</th>
+            <th style="width:68px">ÜS</th>
+            <th style="width:72px">SALDO</th>
+            <th style="width:160px">Ort</th>
+            <th style="width:110px">PKW</th>
+            <th style="width:70px">km</th>
+            <th style="width:150px">Pauschalen</th>
+            <th style="width:90px">Erstattung</th>
+            <th style="width:110px">Erstattung km</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"><tr class="">
+      <td><b>01.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mi</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,1,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,1,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,1,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,1,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,1,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,1,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,1,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,1,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>02.07.</b></td>
+      <td style="color:inherit;font-weight:600">Do</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,2,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,2,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,2,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,2,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,2,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,2,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,2,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,2,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-today">
+      <td><b>03.07.</b><span style="margin-left:5px;font-size:10px;background:var(--primary);color:#fff;padding:1px 5px;border-radius:99px">heute</span></td>
+      <td style="color:inherit;font-weight:600">Fr</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,3,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,3,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,3,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,3,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,3,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,3,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,3,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,3,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-we">
+      <td><b>04.07.</b></td>
+      <td style="color:var(--muted);font-weight:400">Sa</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,4,this)">
+          <option value="work">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend" selected="selected">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,4,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,4,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" min="0" max="180" step="5" disabled="disabled" onchange="onField(2026,6,4,'pause',this.value)"></td>
+      <td style="text-align:center">--:--</td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu "></span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,4,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,4,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,4,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" disabled="disabled" onchange="onField(2026,6,4,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-we">
+      <td><b>05.07.</b></td>
+      <td style="color:var(--muted);font-weight:400">So</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,5,this)">
+          <option value="work">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend" selected="selected">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,5,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,5,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" min="0" max="180" step="5" disabled="disabled" onchange="onField(2026,6,5,'pause',this.value)"></td>
+      <td style="text-align:center">--:--</td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu "></span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,5,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,5,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,5,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" disabled="disabled" onchange="onField(2026,6,5,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>06.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mo</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,6,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,6,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,6,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,6,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,6,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,6,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,6,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,6,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>07.07.</b></td>
+      <td style="color:inherit;font-weight:600">Di</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,7,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,7,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,7,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,7,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,7,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,7,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,7,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,7,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>08.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mi</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,8,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,8,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,8,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,8,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,8,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,8,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,8,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,8,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>09.07.</b></td>
+      <td style="color:inherit;font-weight:600">Do</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,9,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,9,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,9,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,9,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,9,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,9,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,9,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,9,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>10.07.</b></td>
+      <td style="color:inherit;font-weight:600">Fr</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,10,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,10,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,10,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,10,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,10,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,10,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,10,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,10,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-we">
+      <td><b>11.07.</b></td>
+      <td style="color:var(--muted);font-weight:400">Sa</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,11,this)">
+          <option value="work">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend" selected="selected">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,11,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,11,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" min="0" max="180" step="5" disabled="disabled" onchange="onField(2026,6,11,'pause',this.value)"></td>
+      <td style="text-align:center">--:--</td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu "></span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,11,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,11,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,11,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" disabled="disabled" onchange="onField(2026,6,11,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-we">
+      <td><b>12.07.</b></td>
+      <td style="color:var(--muted);font-weight:400">So</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,12,this)">
+          <option value="work">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend" selected="selected">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,12,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,12,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" min="0" max="180" step="5" disabled="disabled" onchange="onField(2026,6,12,'pause',this.value)"></td>
+      <td style="text-align:center">--:--</td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu "></span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,12,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,12,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,12,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" disabled="disabled" onchange="onField(2026,6,12,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>13.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mo</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,13,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,13,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,13,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,13,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,13,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,13,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,13,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,13,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>14.07.</b></td>
+      <td style="color:inherit;font-weight:600">Di</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,14,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,14,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,14,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,14,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,14,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,14,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,14,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,14,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>15.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mi</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,15,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,15,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,15,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,15,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,15,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,15,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,15,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,15,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>16.07.</b></td>
+      <td style="color:inherit;font-weight:600">Do</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,16,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,16,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,16,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,16,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,16,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,16,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,16,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,16,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>17.07.</b></td>
+      <td style="color:inherit;font-weight:600">Fr</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,17,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,17,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,17,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,17,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,17,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,17,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,17,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,17,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-we">
+      <td><b>18.07.</b></td>
+      <td style="color:var(--muted);font-weight:400">Sa</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,18,this)">
+          <option value="work">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend" selected="selected">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,18,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,18,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" min="0" max="180" step="5" disabled="disabled" onchange="onField(2026,6,18,'pause',this.value)"></td>
+      <td style="text-align:center">--:--</td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu "></span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,18,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,18,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,18,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" disabled="disabled" onchange="onField(2026,6,18,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-we">
+      <td><b>19.07.</b></td>
+      <td style="color:var(--muted);font-weight:400">So</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,19,this)">
+          <option value="work">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend" selected="selected">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,19,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,19,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" min="0" max="180" step="5" disabled="disabled" onchange="onField(2026,6,19,'pause',this.value)"></td>
+      <td style="text-align:center">--:--</td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu "></span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,19,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,19,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,19,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" disabled="disabled" onchange="onField(2026,6,19,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>20.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mo</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,20,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,20,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,20,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,20,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,20,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,20,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,20,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,20,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>21.07.</b></td>
+      <td style="color:inherit;font-weight:600">Di</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,21,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,21,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,21,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,21,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,21,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,21,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,21,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,21,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>22.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mi</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,22,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,22,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,22,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,22,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,22,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,22,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,22,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,22,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>23.07.</b></td>
+      <td style="color:inherit;font-weight:600">Do</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,23,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,23,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,23,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,23,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,23,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,23,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,23,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,23,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>24.07.</b></td>
+      <td style="color:inherit;font-weight:600">Fr</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,24,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,24,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,24,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,24,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,24,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,24,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,24,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,24,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-we">
+      <td><b>25.07.</b></td>
+      <td style="color:var(--muted);font-weight:400">Sa</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,25,this)">
+          <option value="work">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend" selected="selected">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,25,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,25,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" min="0" max="180" step="5" disabled="disabled" onchange="onField(2026,6,25,'pause',this.value)"></td>
+      <td style="text-align:center">--:--</td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu "></span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,25,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,25,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,25,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" disabled="disabled" onchange="onField(2026,6,25,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="row-we">
+      <td><b>26.07.</b></td>
+      <td style="color:var(--muted);font-weight:400">So</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,26,this)">
+          <option value="work">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend" selected="selected">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,26,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" disabled="disabled" onchange="onField(2026,6,26,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" min="0" max="180" step="5" disabled="disabled" onchange="onField(2026,6,26,'pause',this.value)"></td>
+      <td style="text-align:center">--:--</td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu "></span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,26,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,26,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,26,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" disabled="disabled" onchange="onField(2026,6,26,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>27.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mo</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,27,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,27,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,27,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,27,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,27,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,27,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,27,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,27,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>28.07.</b></td>
+      <td style="color:inherit;font-weight:600">Di</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,28,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,28,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,28,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,28,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,28,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,28,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,28,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,28,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>29.07.</b></td>
+      <td style="color:inherit;font-weight:600">Mi</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,29,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,29,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,29,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,29,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,29,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,29,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,29,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,29,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>30.07.</b></td>
+      <td style="color:inherit;font-weight:600">Do</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,30,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,30,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,30,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,30,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,30,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,30,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,30,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,30,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr><tr class="">
+      <td><b>31.07.</b></td>
+      <td style="color:inherit;font-weight:600">Fr</td>
+      <td>
+        <select class="ts" onchange="onType(2026,6,31,this)">
+          <option value="work" selected="selected">🖥️ Arbeit</option>
+          <option value="homeoffice">🏠 Homeoffice</option>
+          <option value="vacation">🏖️ Urlaub</option>
+          <option value="sick">🤒 Krank</option>
+          <option value="holiday">🎉 Feiertag</option>
+          <option value="compensation">⚖️ Ausgleich</option>
+          <option value="weekend">📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,31,'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" onchange="onField(2026,6,31,'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="30" min="0" max="180" step="5" onchange="onField(2026,6,31,'pause',this.value)"></td>
+      <td style="text-align:center"><span class="mono" style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span style="color:var(--muted)">--:--</span></td>
+      <td style="text-align:center"><span class="d "></span></td>
+      <td style="text-align:center"><span class="cu cup">0:00</span></td>
+      <td><input type="text" class="ni" onchange="onField(2026,6,31,'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" onchange="onField(2026,6,31,'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" min="0" step="0.1" disabled="disabled" onchange="onField(2026,6,31,'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" onchange="onField(2026,6,31,'verpfType',this.value)">
+          <option value="none" selected="selected">keine</option><option value="arrival_departure">An-/Abreisetag</option><option value="full">Ganzer Tag mit ÜN</option><option value="full_breakfast">Ganzer Tag m. Frühstück</option><option value="8h_no_overnight">≥ 8h ohne ÜN</option>
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono"></span></td>
+      <td style="text-align:center"><span class="mono"></span></td>
+    </tr></tbody>
+        <tfoot>
+          <tr class="tfoot-r">
+            <td colspan="6">Monatssumme</td>
+            <td class="mono tc-c" id="ft-ist"><b>0:00</b></td>
+            <td class="mono tc-c" id="ft-soll"><b>0:00</b></td>
+            <td class="mono tc-c" id="ft-diff"><b class="d dz">0:00</b></td>
+            <td></td><td></td><td></td>
+            <td class="mono tc-c" id="ft-km">0,0 km</td>
+            <td></td>
+            <td class="mono tc-c" id="ft-verpf">0,00 €</td>
+            <td class="mono tc-c" id="ft-fahrt">0,00 €</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="legend no-print">
+    <div class="li"><div class="ld" style="background:#dbeafe"></div>Arbeit</div>
+    <div class="li"><div class="ld" style="background:#e0e7ff"></div>Homeoffice</div>
+    <div class="li"><div class="ld" style="background:#dcfce7"></div>Urlaub</div>
+    <div class="li"><div class="ld" style="background:#ffe4e6"></div>Krank</div>
+    <div class="li"><div class="ld" style="background:#fefce8"></div>Feiertag</div>
+    <div class="li"><div class="ld" style="background:#f3e8ff"></div>Ausgleich/Gleitzeit</div>
+    <div class="li"><div class="ld" style="background:#f8fafc;border:1px solid #e2e8f0"></div>Wochenende</div>
+    <div class="li"><div class="ld" style="background:#eff6ff;border:1px solid #bfdbfe"></div>Heute</div>
+  </div>
+</div>
+
+<!-- ===== JAHR ===== -->
+<div id="tc-jahr" class="tc">
+  <div class="stitle" id="yr-title">Jahresübersicht</div>
+  <div class="cards">
+    <div class="card"><div class="card-lbl">Jahres-Überstunden</div><div class="card-val" id="yc-ue">+0:00</div><div class="card-sub">Gesamtsaldo ab Vertragsstart</div></div>
+    <div class="card"><div class="card-lbl">Urlaub genommen</div><div class="card-val cv-blue" id="yc-url">0 / 0</div><div class="card-sub" id="yc-url-s">0 verbleibend</div></div>
+    <div class="card"><div class="card-lbl">Kranktage</div><div class="card-val" id="yc-krank">0</div><div class="card-sub">Im laufenden Jahr</div></div>
+    <div class="card"><div class="card-lbl">Gearbeitete Stunden</div><div class="card-val cv-blue" id="yc-ist">0:00</div><div class="card-sub" id="yc-soll-s">Soll ab Vertragsstart bis heute</div></div>
+    <div class="card"><div class="card-lbl">Homeoffice-Tage</div><div class="card-val cv-blue" id="yc-ho">0</div><div class="card-sub">Im laufenden Jahr</div></div>
+    <div class="card"><div class="card-lbl">Verpflegung gesamt</div><div class="card-val cv-blue" id="yc-verpf">0,00 €</div><div class="card-sub">Jahressumme</div></div>
+    <div class="card"><div class="card-lbl">Fahrtkosten gesamt</div><div class="card-val cv-blue" id="yc-km">0,00 €</div><div class="card-sub">Jahressumme</div></div>
+  </div>
+  <div class="tw">
+    <div class="tscroll">
+      <table class="yt">
+        <thead>
+          <tr>
+            <th style="width:120px">Monat</th>
+            <th>IST (h)</th><th>SOLL (h)</th><th>Differenz</th><th>Σ Überstunden</th>
+            <th>Arbeitstage</th><th>Homeoffice</th><th>Urlaub</th><th>Krank</th><th>Feiertage</th>
+            <th>Verpflegung (EUR)</th><th>Fahrtkosten (EUR)</th>
+          </tr>
+        </thead>
+        <tbody id="yr-tbody"></tbody>
+        <tfoot>
+          <tr class="tfoot-r">
+            <td style="text-align:left">Gesamt</td>
+            <td class="mono" id="yft-ist"></td>
+            <td class="mono" id="yft-soll"></td>
+            <td class="mono" id="yft-diff"></td>
+            <td></td>
+            <td id="yft-at"></td>
+            <td id="yft-ho"></td>
+            <td id="yft-url"></td>
+            <td id="yft-krank"></td>
+            <td id="yft-fei"></td>
+            <td class="mono" id="yft-verpf"></td>
+            <td class="mono" id="yft-fahrt"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EINSTELLUNGEN ===== -->
+<div id="tc-settings" class="tc">
+  <div class="stitle">Einstellungen</div>
+  <div class="sg">
+    <div class="sc">
+      <h3>👤 Mitarbeiterdaten</h3>
+      <div class="fg"><label>Name</label><input type="text" id="s-name"></div>
+      <div class="fg"><label>Personalnummer (optional)</label><input type="text" id="s-pnr"></div>
+      <div class="fg"><label>Abteilung (optional)</label><input type="text" id="s-dept"></div>
+      <div class="fg">
+        <label>Vertragsstart (Minus 1 Tag, also Vortag)</label>
+        <input type="date" id="s-contract-start">
+        <div class="fh">Ab diesem Datum werden Sollstunden und Überstunden berechnet.</div>
+      </div>
+      <div class="fg">
+        <label>Urlaub Startjahr (Tage, berechnet)</label>
+        <input type="number" id="s-start-year-leave" step="0.5" min="0" readonly="readonly">
+        <div class="fh">Anteilig ab Vertragsbeginn im Erfassungsjahr, kaufmännisch auf 0,5 gerundet.</div>
+      </div>
+    </div>
+    <div class="sc">
+      <h3>🕐 Arbeitszeit</h3>
+      <div class="fg">
+        <label>Standard-Soll-Stunden pro Arbeitstag</label>
+        <input type="number" id="s-soll" value="8" min="1" max="24" step="0.5">
+      </div>
+      <div class="fg">
+        <label>Individuelle Soll-Stunden je Wochentag</label>
+        <div class="wd-grid">
+          <div><span>Mo</span><input type="number" id="s-wd-1" min="0" max="24" step="0.25"></div>
+          <div><span>Di</span><input type="number" id="s-wd-2" min="0" max="24" step="0.25"></div>
+          <div><span>Mi</span><input type="number" id="s-wd-3" min="0" max="24" step="0.25"></div>
+          <div><span>Do</span><input type="number" id="s-wd-4" min="0" max="24" step="0.25"></div>
+          <div><span>Fr</span><input type="number" id="s-wd-5" min="0" max="24" step="0.25"></div>
+          <div><span>Sa</span><input type="number" id="s-wd-6" min="0" max="24" step="0.25"></div>
+          <div><span>So</span><input type="number" id="s-wd-0" min="0" max="24" step="0.25"></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Arbeitstage der Woche</label>
+        <div class="cbg" id="wd-cbg">
+          <label class="dcb ck"><input type="checkbox" value="1" checked="checked"> Mo</label>
+          <label class="dcb ck"><input type="checkbox" value="2" checked="checked"> Di</label>
+          <label class="dcb ck"><input type="checkbox" value="3" checked="checked"> Mi</label>
+          <label class="dcb ck"><input type="checkbox" value="4" checked="checked"> Do</label>
+          <label class="dcb ck"><input type="checkbox" value="5" checked="checked"> Fr</label>
+          <label class="dcb"><input type="checkbox" value="6"> Sa</label>
+          <label class="dcb"><input type="checkbox" value="0"> So</label>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Gesetzliche Pausenregelung (DE)</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="s-pause-law" checked="checked">
+          Automatische Mindestpausen anwenden
+        </label>
+        <div class="fh">
+          6–9 h Arbeitszeit: mindestens 30 Minuten Pause · &gt; 9 h: mindestens 45 Minuten.<br>
+          Bei Verpflegungspauschalen mindestens 60 Minuten Pause.
+        </div>
+      </div>
+      <div class="fg"><label>Standard-Pause (Minuten)</label><input type="number" id="s-pause" value="30" min="0" max="120" step="5"></div>
+    </div>
+    <div class="sc">
+      <h3>🏖️ Urlaub</h3>
+      <div class="fg"><label>Jahresurlaub (Tage)</label><input type="number" id="s-url" value="30" min="0" max="365"></div>
+      <div class="fg"><label>Urlaubsübertrag aus Vorjahr</label><input type="number" id="s-url-ue" value="0" min="0" max="365"></div>
+    </div>
+    <div class="sc">
+      <h3>🍽️ Verpflegungsmehraufwand</h3>
+      <div class="fg"><label>An-/Abreisetag mit Übernachtung</label><input type="number" id="s-vm-arr-dep" step="0.5" min="0" value="14"></div>
+      <div class="fg"><label>Ganzer Tag mit Übernachtung</label><input type="number" id="s-vm-full" step="0.5" min="0" value="28"></div>
+      <div class="fg"><label>Ganzer Tag mit Übernachtung &amp; Frühstück</label><input type="number" id="s-vm-full-fr" step="0.5" min="0" value="22.4"></div>
+      <div class="fg"><label>Abwesenheit &gt;= 8h ohne Übernachtung</label><input type="number" id="s-vm-8h" step="0.5" min="0" value="14"></div>
+    </div>
+    <div class="sc">
+      <h3>🚗 Fahrten (Privater PKW)</h3>
+      <div class="fg"><label>km-Pauschale (EUR pro km)</label><input type="number" id="s-km-rate" step="0.01" min="0" value="0.30"></div>
+    </div>
+    <div class="sc">
+      <h3>📅 Feiertage</h3>
+      <div class="fg">
+        <label>Bundesland</label>
+        <select id="s-bl">
+          <option value="national" selected="selected">Nur bundesweite Feiertage</option>
+          <option value="BW">Baden-Württemberg</option>
+          <option value="BY">Bayern</option>
+          <option value="BE">Berlin</option>
+          <option value="BB">Brandenburg</option>
+          <option value="HB">Bremen</option>
+          <option value="HH">Hamburg</option>
+          <option value="HE">Hessen</option>
+          <option value="MV">Mecklenburg-Vorpommern</option>
+          <option value="NI">Niedersachsen</option>
+          <option value="NW">Nordrhein-Westfalen</option>
+          <option value="RP">Rheinland-Pfalz</option>
+          <option value="SL">Saarland</option>
+          <option value="SN">Sachsen</option>
+          <option value="ST">Sachsen-Anhalt</option>
+          <option value="SH">Schleswig-Holstein</option>
+          <option value="TH">Thüringen</option>
+        </select>
+      </div>
+      <div class="fg"><label>Erfassungsjahr</label><input type="number" id="s-year" value="2026" min="2020" max="2035"></div>
+    </div>
+    <div class="sc">
+      <h3>💾 Datensicherung</h3>
+      <div class="fg">
+        <label>Daten exportieren</label>
+        <button class="btn btn-p" onclick="exportJSON()" style="width:100%">📥 Als JSON exportieren</button>
+      </div>
+      <div class="fg">
+        <label>Daten importieren</label>
+        <input type="file" id="imp-file" accept=".json" onchange="importJSON(event)" style="font-size:12px">
+      </div>
+      <div class="fg">
+        <label style="color:var(--danger)">Alle Daten löschen</label>
+        <button class="btn" onclick="resetAll()" style="width:100%;border-color:var(--danger);color:var(--danger)">🗑️ Zurücksetzen</button>
+      </div>
+    </div>
+  </div>
+  <div class="mt3">
+    <button class="btn btn-p" onclick="saveSettings()">💾 Einstellungen speichern</button>
+    <span id="saved-ok">✓ Gespeichert!</span>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+const MN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const DN=['So','Mo','Di','Mi','Do','Fr','Sa'];
+const VERP_TYPES=[
+  {value:'none',label:'keine'},
+  {value:'arrival_departure',label:'An-/Abreisetag'},
+  {value:'full',label:'Ganzer Tag mit ÜN'},
+  {value:'full_breakfast',label:'Ganzer Tag m. Frühstück'},
+  {value:'8h_no_overnight',label:'≥ 8h ohne ÜN'}
+];
+
+let cfg={},data={},curY,curM;
+
+function defCfg(){return{name:'',pnr:'',dept:'',contractStart:null,startYearLeave:0,soll:8,weekSoll:{0:null,1:null,2:null,3:null,4:null,5:null,6:null},workdays:[1,2,3,4,5],pause:30,pauseLaw:true,urlaub:30,urlaubUe:0,bundesland:'national',year:new Date().getFullYear(),vmArrivalDeparture:14,vmFull:28,vmFullBreakfast:22.4,vm8h:14,kmRate:0.30};}
+
+function load(){cfg=JSON.parse(localStorage.getItem('az_cfg')||'null')||defCfg();cfg=Object.assign(defCfg(),cfg);data=JSON.parse(localStorage.getItem('az_data')||'{}');const n=new Date();curY=cfg.year||n.getFullYear();curM=n.getMonth();}
+function save(){localStorage.setItem('az_cfg',JSON.stringify(cfg));localStorage.setItem('az_data',JSON.stringify(data));}
+function getKey(y,m,d){return`${y}-${m}-${d}`;}
+function getE(y,m,d){return data[getKey(y,m,d)]||null;}
+function setE(y,m,d,entry){data[getKey(y,m,d)]=entry;save();}
+
+function easter(Y){const a=Y%19,b=Math.floor(Y/100),c=Y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31)-1,dy=((h+l-7*m+114)%31)+1;return new Date(Y,mo,dy);}
+function addD(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function dk(d){return`${d.getMonth()+1}-${d.getDate()}`;}
+
+function holidays(Y,bl){
+  const E=easter(Y),H={};
+  [['1-1','Neujahr'],['5-1','Tag der Arbeit'],['10-3','Tag der Deutschen Einheit'],['12-25','1. Weihnachtstag'],['12-26','2. Weihnachtstag']].forEach(([k,n])=>H[k]=n);
+  [[-2,'Karfreitag'],[1,'Ostermontag'],[39,'Christi Himmelfahrt'],[50,'Pfingstmontag']].forEach(([o,n])=>H[dk(addD(E,o))]=n);
+  const fronleichnam=dk(addD(E,60));
+  const ST={BW:[['1-6','Heilige Drei Könige'],['11-1','Allerheiligen'],[fronleichnam,'Fronleichnam']],BY:[['1-6','Heilige Drei Könige'],['8-15','Mariä Himmelfahrt'],['11-1','Allerheiligen'],[fronleichnam,'Fronleichnam']],BE:[['3-8','Internationaler Frauentag']],BB:[['10-31','Reformationstag']],HB:[['10-31','Reformationstag']],HH:[['10-31','Reformationstag']],HE:[[fronleichnam,'Fronleichnam']],MV:[['10-31','Reformationstag']],NI:[['10-31','Reformationstag']],NW:[['11-1','Allerheiligen'],[fronleichnam,'Fronleichnam']],RP:[['11-1','Allerheiligen'],[fronleichnam,'Fronleichnam']],SL:[['8-15','Mariä Himmelfahrt'],['11-1','Allerheiligen'],[fronleichnam,'Fronleichnam']],SN:[[fronleichnam,'Fronleichnam'],['10-31','Reformationstag']],ST:[['1-6','Heilige Drei Könige'],['10-31','Reformationstag']],SH:[['10-31','Reformationstag']],TH:[['9-20','Weltkindertag'],['10-31','Reformationstag']]};
+  if(ST[bl])ST[bl].forEach(([k,n])=>H[k]=n);
+  return H;
+}
+
+function parseT(s){if(!s)return null;const p=s.split(':').map(Number);if(p.length!==2||isNaN(p[0])||isNaN(p[1]))return null;return p[0]*60+p[1];}
+function fmtT(m){if(m===null||m===undefined)return'--:--';const sg=m<0?'-':'',a=Math.abs(m);return`${sg}${Math.floor(a/60)}:${(a%60).toString().padStart(2,'0')}`;}
+function fmtEUR(v){return(v||0).toFixed(2).replace('.',',')+' €';}
+function calcIst(s,e,p){const sv=parseT(s),ev=parseT(e);if(sv===null||ev===null)return null;return Math.max(0,ev-sv-(parseInt(p)||0));}
+function isWD(date){return cfg.workdays.includes(date.getDay());}
+function daySollMinutes(date,H){const dow=date.getDay();if(!isWD(date))return 0;if(H[`${date.getMonth()+1}-${date.getDate()}`])return 0;const wdHours=cfg.weekSoll[dow];const h=(wdHours!==null&&wdHours!==undefined&&wdHours!=='')?wdHours:cfg.soll;return Math.round(parseFloat(h||0)*60);}
+function minPauseByIstMinutes(istMin){const h=istMin/60;if(h>=9)return 45;if(h>=6)return 30;return 0;}
+function isBeforeContractStart(date){if(!cfg.contractStart)return false;const cs=new Date(cfg.contractStart);if(isNaN(cs.getTime()))return false;return date<cs;}
+
+function monthStats(Y,M,upToLastIst=false,limitToToday=false){
+  const H=holidays(Y,cfg.bundesland),dimOriginal=new Date(Y,M+1,0).getDate();
+  let dim=dimOriginal;
+  const today=new Date();
+  const isCurrentYear=Y===today.getFullYear();
+  const isCurrentMonth=isCurrentYear&&M===today.getMonth();
+  if(limitToToday&&isCurrentMonth){dim=today.getDate();}
+  let lastIstDay=dim;
+  if(upToLastIst){
+    lastIstDay=0;
+    for(let d=1;d<=dim;d++){
+      const dt=new Date(Y,M,d);
+      if(Y===(cfg.contractStart?new Date(cfg.contractStart).getFullYear():-1)&&isBeforeContractStart(dt))continue;
+      const e=getE(Y,M,d)||{};
+      const type=e.type||'';
+      if(type==='work'||type==='homeoffice'){
+        let pause=e.pause!==undefined?e.pause:cfg.pause;
+        const rawStart=parseT(e.start||''),rawEnd=parseT(e.end||'');
+        if(rawStart!==null&&rawEnd!==null){
+          const rawWork=rawEnd-rawStart;
+          if(rawWork>0){
+            if(cfg.pauseLaw){const minP=minPauseByIstMinutes(rawWork);if(pause<minP)pause=minP;}
+            if((e.verpfType||'none')!=='none'&&pause<60)pause=60;
+          }
+        }else if((e.verpfType||'none')!=='none'&&pause<60)pause=60;
+        const istMin=calcIst(e.start||'',e.end||'',pause);
+        if(istMin!==null&&istMin>0)lastIstDay=d;
+      }
+    }
+    if(lastIstDay===0)lastIstDay=dim;
+  }
+  let ist=0,soll=0,diff=0,at=0,ho=0,url=0,krank=0,fei=0,verpf=0,kmCost=0;
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(Y,M,d),we=dt.getDay()===0||dt.getDay()===6;
+    const hk=`${M+1}-${d}`,hn=H[hk];
+    const e=getE(Y,M,d)||{};
+    let type=e.type||(we?'weekend':hn?'holiday':'work');
+    const swRaw=daySollMinutes(dt,H);
+    let sw=0;
+    const isBeforeStartThisYear=(Y===(cfg.contractStart?new Date(cfg.contractStart).getFullYear():-1)&&isBeforeContractStart(dt));
+    let considerSoll=false;
+    if((type==='compensation'||type==='work'||type==='homeoffice')&&!isBeforeStartThisYear){
+      const hasTimes=e.start&&e.end;
+      if(type==='compensation')considerSoll=true;
+      else if(hasTimes)considerSoll=true;
+    }
+    if(considerSoll)sw=swRaw;
+    if(type==='weekend')continue;
+    if(Y===(cfg.contractStart?new Date(cfg.contractStart).getFullYear():-1)&&isBeforeContractStart(dt))continue;
+    if(upToLastIst&&d>lastIstDay)continue;
+    if(type==='work'||type==='homeoffice'){
+      let pause=e.pause!==undefined?e.pause:cfg.pause;
+      const rawStart=parseT(e.start||''),rawEnd=parseT(e.end||'');
+      if(rawStart!==null&&rawEnd!==null){
+        const rawWork=rawEnd-rawStart;
+        if(rawWork>0){
+          if(cfg.pauseLaw){const minP=minPauseByIstMinutes(rawWork);if(pause<minP)pause=minP;}
+          if((e.verpfType||'none')!=='none'&&pause<60)pause=60;
+        }
+      }else if((e.verpfType||'none')!=='none'&&pause<60)pause=60;
+      const i=calcIst(e.start||'',e.end||'',pause)||0;
+      ist+=i;soll+=sw;diff+=i-sw;
+      if(type==='homeoffice')ho++;else at++;
+      const vType=e.verpfType||'none';
+      verpf+=verpfAmount(vType);
+      if(e.pkw&&e.km){kmCost+=(parseFloat(e.km)||0)*(cfg.kmRate||0);}
+    }else if(type==='vacation'){url++;soll+=sw;ist+=sw;
+    }else if(type==='sick'){krank++;soll+=sw;ist+=sw;
+    }else if(type==='holiday'){fei++;soll+=sw;ist+=sw;
+    }else if(type==='compensation'){diff-=sw;soll+=sw;}
+  }
+  return{ist,soll,diff,at,ho,url,krank,fei,verpf,kmCost};
+}
+
+function carryover(Y,M){let t=0;for(let m=0;m<M;m++)t+=monthStats(Y,m,true).diff;return t;}
+
+function verpfAmount(vType){
+  switch(vType){
+    case'arrival_departure':return parseFloat(cfg.vmArrivalDeparture)||0;
+    case'full':return parseFloat(cfg.vmFull)||0;
+    case'full_breakfast':return parseFloat(cfg.vmFullBreakfast)||0;
+    case'8h_no_overnight':return parseFloat(cfg.vm8h)||0;
+    default:return 0;
+  }
+}
+
+function renderMonth(){
+  const Y=curY,M=curM,today=new Date();
+  const H=holidays(Y,cfg.bundesland),dim=new Date(Y,M+1,0).getDate();
+  const contractYear=cfg.contractStart?new Date(cfg.contractStart).getFullYear():null;
+  document.getElementById('mon-title').textContent=`${MN[M]} ${Y}`;
+  document.getElementById('hdr-name').textContent=cfg.name||'';
+  document.getElementById('hdr-date').textContent=today.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'});
+  const tbody=document.getElementById('tbody');tbody.innerHTML='';
+  let cumul=carryover(Y,M),totIst=0,totSoll=0,totKm=0,totVerpf=0,totKmCost=0;
+  let lastIstDay=0;
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(Y,M,d);
+    if(contractYear===Y&&isBeforeContractStart(dt))continue;
+    const e=getE(Y,M,d)||{};
+    const type=e.type||'';
+    if(type==='work'||type==='homeoffice'){
+      let pause=e.pause!==undefined?e.pause:cfg.pause;
+      const rawStart=parseT(e.start||''),rawEnd=parseT(e.end||'');
+      if(rawStart!==null&&rawEnd!==null){
+        const rawWork=rawEnd-rawStart;
+        if(rawWork>0){
+          if(cfg.pauseLaw){const minP=minPauseByIstMinutes(rawWork);if(pause<minP)pause=minP;}
+          if((e.verpfType||'none')!=='none'&&pause<60)pause=60;
+        }
+      }else if((e.verpfType||'none')!=='none'&&pause<60)pause=60;
+      const istMin=calcIst(e.start||'',e.end||'',pause);
+      if(istMin!==null&&istMin>0)lastIstDay=d;
+    }
+  }
+  if(lastIstDay===0)lastIstDay=dim;
+
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(Y,M,d);
+    const dw=dt.getDay(),we=dw===0||dw===6;
+    const hk=`${M+1}-${d}`,hn=H[hk];
+    const isToday=dt.toDateString()===today.toDateString();
+    const e=getE(Y,M,d)||{};
+    let type=e.type||(we?'weekend':hn?'holiday':'work');
+    const swRaw=daySollMinutes(dt,H);
+    let sw=0;
+    const isBeforeStartThisYear=(contractYear===Y&&isBeforeContractStart(dt));
+    let considerSoll=false;
+    if((type==='compensation'||type==='work'||type==='homeoffice')&&!isBeforeStartThisYear){
+      const hasTimes=e.start&&e.end;
+      if(type==='compensation')considerSoll=true;
+      else if(hasTimes)considerSoll=true;
+    }
+    if(considerSoll)sw=swRaw;
+    const start=e.start||'',end=e.end||'';
+    let pause=e.pause!==undefined?e.pause:cfg.pause;
+    const place=e.place||'';
+    const pkw=!!e.pkw;
+    const km=e.km!==undefined&&e.km!==null?e.km:'';
+    const verpfType=e.verpfType||'none';
+    let istMin=null,diffMin=null;
+    const disIn=type==='vacation'||type==='sick'||type==='holiday'||type==='compensation'||(type==='weekend');
+    if(type==='work'||type==='homeoffice'){
+      let usedPause=pause;
+      const rawStart=parseT(start),rawEnd=parseT(end);
+      if(rawStart!==null&&rawEnd!==null){
+        const rawWork=rawEnd-rawStart;
+        if(rawWork>0){
+          if(cfg.pauseLaw){const minP=minPauseByIstMinutes(rawWork);if(usedPause<minP)usedPause=minP;}
+          if(verpfType!=='none'&&usedPause<60)usedPause=60;
+        }
+      }else if(verpfType!=='none'&&usedPause<60){usedPause=60;}
+      if(usedPause!==pause){pause=usedPause;e.pause=usedPause;setE(Y,M,d,e);}
+      istMin=calcIst(start,end,pause);
+      if(!isBeforeStartThisYear&&d<=lastIstDay){
+        if(istMin!==null){diffMin=istMin-sw;cumul+=diffMin;totIst+=istMin;totSoll+=sw;}
+        else{totSoll+=sw;}
+      }
+    }else if(type==='vacation'||type==='sick'||type==='holiday'){
+      if(!isBeforeStartThisYear&&d<=lastIstDay){diffMin=0;totSoll+=sw;totIst+=sw;}
+    }else if(type==='compensation'){
+      if(!isBeforeStartThisYear&&d<=lastIstDay){diffMin=-sw;cumul+=diffMin;totSoll+=sw;}
+    }
+    let vAmount=0;
+    if(type==='work')vAmount=verpfAmount(verpfType);
+    let kmAmount=0;
+    if(pkw&&km){kmAmount=(parseFloat(km)||0)*(cfg.kmRate||0);}
+    if((type==='work'||type==='homeoffice')&&!isBeforeStartThisYear&&d<=lastIstDay){
+      totVerpf+=vAmount;totKm+=parseFloat(km)||0;totKmCost+=kmAmount;
+    }
+    let rc='';
+    if(isToday)rc='row-today';
+    else if(type==='weekend')rc='row-we';
+    else if(type==='holiday')rc='row-hol';
+    else if(type==='vacation')rc='row-vac';
+    else if(type==='sick')rc='row-sick';
+    else if(type==='compensation')rc='row-comp';
+    const diffCls=diffMin===null?'':(diffMin>0?'dp':diffMin<0?'dn':'dz');
+    const cumulCls=cumul>=0?'cup':'cun';
+    const diffStr=diffMin!==null?fmtT(diffMin):'';
+    const cumulStr=(!isBeforeStartThisYear&&d<=lastIstDay&&type!=='weekend')?fmtT(cumul):'';
+    let istCell='--:--';
+    if(type==='work'||type==='homeoffice')istCell=istMin!==null?`<span class="mono">${fmtT(istMin)}</span>`:'<span class="mono" style="color:var(--muted)">--:--</span>';
+    else if(type==='vacation')istCell='<span style="font-size:11px;color:var(--success);font-weight:600">Urlaub</span>';
+    else if(type==='sick')    istCell='<span style="font-size:11px;color:var(--danger);font-weight:600">Krank</span>';
+    else if(type==='holiday') istCell='<span style="font-size:11px;color:#854d0e;font-weight:600">'+hn+'</span>';
+    else if(type==='compensation')istCell='<span style="font-size:11px;color:#7c3aed;font-weight:600">Ausgleich</span>';
+    const sollCell=sw>0?`<span class="mono">${fmtT(sw)}</span>`:'<span style="color:var(--muted)">--:--</span>';
+    const tr=document.createElement('tr');
+    tr.className=rc;
+    const verpfDisabled=!(type==='work');
+    tr.innerHTML=`
+      <td><b>${String(d).padStart(2,'0')}.${String(M+1).padStart(2,'0')}.</b>${isToday?'<span style="margin-left:5px;font-size:10px;background:var(--primary);color:#fff;padding:1px 5px;border-radius:99px">heute</span>':''}</td>
+      <td style="color:${we?'var(--muted)':'inherit'};font-weight:${we?400:600}">${DN[dw]}</td>
+      <td>
+        <select class="ts" onchange="onType(${Y},${M},${d},this)">
+          <option value="work"        ${type==='work'?'selected':''}>🖥️ Arbeit</option>
+          <option value="homeoffice"  ${type==='homeoffice'?'selected':''}>🏠 Homeoffice</option>
+          <option value="vacation"    ${type==='vacation'?'selected':''}>🏖️ Urlaub</option>
+          <option value="sick"        ${type==='sick'?'selected':''}>🤒 Krank</option>
+          <option value="holiday"     ${type==='holiday'?'selected':''}>🎉 Feiertag</option>
+          <option value="compensation"${type==='compensation'?'selected':''}>⚖️ Ausgleich</option>
+          <option value="weekend"     ${type==='weekend'?'selected':''}>📅 Wochenende</option>
+        </select>
+      </td>
+      <td style="text-align:center"><input type="time" class="ti" value="${start}" ${disIn?'disabled':''} onchange="onField(${Y},${M},${d},'start',this.value)"></td>
+      <td style="text-align:center"><input type="time" class="ti" value="${end}"   ${disIn?'disabled':''} onchange="onField(${Y},${M},${d},'end',this.value)"></td>
+      <td style="text-align:center"><input type="number" class="ti pi" value="${disIn?'':pause}" min="0" max="180" step="5" ${disIn?'disabled':''} onchange="onField(${Y},${M},${d},'pause',this.value)"></td>
+      <td style="text-align:center">${istCell}</td>
+      <td style="text-align:center">${sollCell}</td>
+      <td style="text-align:center"><span class="d ${diffCls}">${diffStr}</span></td>
+      <td style="text-align:center"><span class="cu ${(!isBeforeStartThisYear&&d<=lastIstDay&&type!=='weekend')?cumulCls:''}">${cumulStr}</span></td>
+      <td><input type="text" class="ni" value="${place.replace(/"/g,'&quot;')}" onchange="onField(${Y},${M},${d},'place',this.value)"></td>
+      <td style="text-align:center">
+        <label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px">
+          <input type="checkbox" ${pkw?'checked':''} onchange="onField(${Y},${M},${d},'pkw',this.checked)"> privater PKW
+        </label>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ti pi" value="${km!==''?km:''}" min="0" step="0.1" ${!pkw?'disabled':''}
+          onchange="onField(${Y},${M},${d},'km',this.value)">
+      </td>
+      <td style="text-align:center">
+        <select class="ts sel-small" ${verpfDisabled?'disabled':''} onchange="onField(${Y},${M},${d},'verpfType',this.value)">
+          ${VERP_TYPES.map(v=>`<option value="${v.value}" ${v.value===verpfType?'selected':''}>${v.label}</option>`).join('')}
+        </select>
+      </td>
+      <td style="text-align:center"><span class="mono">${vAmount?fmtEUR(vAmount):''}</span></td>
+      <td style="text-align:center"><span class="mono">${kmAmount?fmtEUR(kmAmount):''}</span></td>
+    `;
+    tbody.appendChild(tr);
+  }
+  const fd=totIst-totSoll,fdc=fd>0?'dp':fd<0?'dn':'dz';
+  document.getElementById('ft-ist').innerHTML=`<b>${fmtT(totIst)}</b>`;
+  document.getElementById('ft-soll').innerHTML=`<b>${fmtT(totSoll)}</b>`;
+  document.getElementById('ft-diff').innerHTML=`<b class="d ${fdc}">${fmtT(fd)}</b>`;
+  document.getElementById('ft-km').textContent=(totKm||0).toFixed(1).replace('.',',')+' km';
+  document.getElementById('ft-verpf').textContent=fmtEUR(totVerpf);
+  document.getElementById('ft-fahrt').textContent=fmtEUR(totKmCost);
+  updateDash();
+}
+
+function updateDash(){
+  const Y=curY;
+  const ms=monthStats(Y,curM,true,false);
+  let prevDiff=0,yUrl=0,yKrank=0,yHo=0,yVerpf=0,yKmCost=0,yIst=0,ySoll=0;
+  for(let m=0;m<curM;m++){
+    const s=monthStats(Y,m,true,false);
+    prevDiff+=s.diff;yIst+=s.ist;ySoll+=s.soll;yUrl+=s.url;yKrank+=s.krank;yHo+=s.ho;yVerpf+=s.verpf;yKmCost+=s.kmCost;
+  }
+  yIst+=ms.ist;ySoll+=ms.soll;yUrl+=ms.url;yKrank+=ms.krank;yHo+=ms.ho;yVerpf+=ms.verpf;yKmCost+=ms.kmCost;
+  const setCardTime=(id,val)=>{const el=document.getElementById(id);el.textContent=fmtT(val);el.className='card-val '+(val>0?'cv-pos':val<0?'cv-neg':'cv-blue');};
+  setCardTime('c-ue-mon',ms.diff);
+  document.getElementById('c-ue-mon-s').textContent=`${MN[curM]} ${curY}`;
+  setCardTime('c-ue-ges',prevDiff);
+  const totalLeave=computeTotalLeaveForYear(curY);
+  const urlRemaining=Math.max(0,totalLeave-yUrl);
+  document.getElementById('c-url').textContent=`${yUrl} / ${totalLeave}`;
+  document.getElementById('c-url-s').textContent=`${urlRemaining} verbleibend`;
+  const ck=document.getElementById('c-krank');
+  ck.textContent=ms.krank;ck.className='card-val '+(ms.krank>0?'cv-warn':'cv-blue');
+  document.getElementById('c-krank-s').textContent=`${yKrank} im Jahr`;
+  document.getElementById('c-ho').textContent=ms.ho;
+  document.getElementById('c-ist').textContent=fmtT(ms.ist);
+  document.getElementById('c-soll-s').textContent=`Soll: ${fmtT(ms.soll)}`;
+  document.getElementById('c-verpf-mon').textContent=fmtEUR(ms.verpf);
+  document.getElementById('c-km-mon').textContent=fmtEUR(ms.kmCost);
+}
+
+function renderYear(){
+  const Y=curY;
+  document.getElementById('yr-title').textContent=`Jahresübersicht ${Y}`;
+  const tb=document.getElementById('yr-tbody');tb.innerHTML='';
+  const today=new Date();
+  const isCurrentYear=Y===today.getFullYear();
+  let tI=0,tS=0,tD=0,tAt=0,tHo=0,tUrl=0,tKr=0,tFe=0,tVerpf=0,tKmCost=0,cum=0;
+  for(let m=0;m<=11;m++){
+    const limitToToday=isCurrentYear&&m===today.getMonth();
+    const s=monthStats(Y,m,true,limitToToday);
+    cum+=s.diff;
+    tI+=s.ist;tS+=s.soll;tD+=s.diff;tAt+=s.at;tHo+=s.ho;tUrl+=s.url;tKr+=s.krank;tFe+=s.fei;tVerpf+=s.verpf;tKmCost+=s.kmCost;
+    const dc=s.diff>0?'dp':s.diff<0?'dn':'dz',cc=cum>=0?'cup':'cun';
+    const tr=document.createElement('tr');
+    tr.onclick=()=>{curM=m;switchTab('monat');renderMonth();};
+    tr.title='Zum Monat springen';
+    tr.innerHTML=`
+      <td><b>${MN[m]}</b></td>
+      <td class="mono">${fmtT(s.ist)}</td>
+      <td class="mono">${fmtT(s.soll)}</td>
+      <td class="mono d ${dc}">${fmtT(s.diff)}</td>
+      <td class="mono cu ${cc}">${fmtT(cum)}</td>
+      <td>${s.at+s.ho}</td>
+      <td>${s.ho||'-'}</td>
+      <td>${s.url||'-'}</td>
+      <td>${s.krank?`<span style="color:var(--danger)">${s.krank}</span>`:'-'}</td>
+      <td>${s.fei||'-'}</td>
+      <td class="mono">${fmtEUR(s.verpf)}</td>
+      <td class="mono">${fmtEUR(s.kmCost)}</td>
+    `;
+    tb.appendChild(tr);
+  }
+  const dc=tD>0?'dp':tD<0?'dn':'dz';
+  document.getElementById('yft-ist').textContent=fmtT(tI);
+  document.getElementById('yft-soll').textContent=fmtT(tS);
+  document.getElementById('yft-diff').innerHTML=`<span class="d ${dc}">${fmtT(tD)}</span>`;
+  document.getElementById('yft-at').textContent=tAt;
+  document.getElementById('yft-ho').textContent=tHo;
+  document.getElementById('yft-url').textContent=tUrl;
+  document.getElementById('yft-krank').textContent=tKr;
+  document.getElementById('yft-fei').textContent=tFe;
+  document.getElementById('yft-verpf').textContent=fmtEUR(tVerpf);
+  document.getElementById('yft-fahrt').textContent=fmtEUR(tKmCost);
+  const ue=document.getElementById('yc-ue');
+  ue.textContent=fmtT(tD);ue.className='card-val '+(tD>0?'cv-pos':tD<0?'cv-neg':'cv-blue');
+  const totalLeave=computeTotalLeaveForYear(Y);
+  const urlRemaining=Math.max(0,totalLeave-tUrl);
+  document.getElementById('yc-url').textContent=`${tUrl} / ${totalLeave}`;
+  document.getElementById('yc-url-s').textContent=`${urlRemaining} verbleibend`;
+  const yck=document.getElementById('yc-krank');
+  yck.textContent=tKr;yck.className='card-val '+(tKr>0?'cv-warn':'cv-blue');
+  document.getElementById('yc-ist').textContent=fmtT(tI);
+  document.getElementById('yc-soll-s').textContent=`Soll: ${fmtT(tS)}`;
+  document.getElementById('yc-ho').textContent=tHo;
+  document.getElementById('yc-verpf').textContent=fmtEUR(tVerpf);
+  document.getElementById('yc-km').textContent=fmtEUR(tKmCost);
+}
+
+function roundToHalf(value){return Math.round(value*2)/2;}
+
+function computeStartYearLeave(){
+  if(!cfg.contractStart)return 0;
+  const cs=new Date(cfg.contractStart);
+  if(isNaN(cs.getTime()))return 0;
+  const year=cs.getFullYear();
+  const endOfYear=new Date(year,11,31);
+  const msPerDay=24*60*60*1000;
+  const days=Math.floor((endOfYear-cs)/msPerDay)+1;
+  if(days<=0)return 0;
+  const base=parseFloat(cfg.urlaub)||0;
+  const raw=base/365*days;
+  return roundToHalf(raw);
+}
+
+function computeTotalLeaveForYear(year){
+  if(cfg.contractStart){
+    const csYear=new Date(cfg.contractStart).getFullYear();
+    if(csYear===year){
+      const startLeave=cfg.startYearLeave||computeStartYearLeave();
+      const carry=parseFloat(cfg.urlaubUe)||0;
+      return roundToHalf(startLeave+carry);
+    }
+  }
+  const base=parseFloat(cfg.urlaub)||0;
+  const carry=parseFloat(cfg.urlaubUe)||0;
+  return roundToHalf(base+carry);
+}
+
+function onType(Y,M,d,sel){
+  const type=sel.value,e=getE(Y,M,d)||{};
+  e.type=type;
+  if(type!=='work'&&type!=='homeoffice'){e.start='';e.end='';}
+  setE(Y,M,d,e);renderMonth();
+}
+
+function onField(Y,M,d,field,val){
+  const e=getE(Y,M,d)||{};
+  if(field==='pkw'){
+    e.pkw=!!val;if(!e.pkw)e.km='';
+  }else if(field==='km'){
+    e.km=val;
+  }else if(field==='verpfType'){
+    e.verpfType=val;
+  }else{
+    e[field]=val;
+    if((field==='start'||field==='end')&&val&&(!e.type||e.type==='weekend'||e.type==='holiday'))e.type='work';
+  }
+  setE(Y,M,d,e);renderMonth();
+}
+
+function changeMonth(dir){
+  curM+=dir;
+  if(curM>11){curM=0;curY++;cfg.year=curY;save();}
+  if(curM<0){curM=11;curY--;cfg.year=curY;save();}
+  renderMonth();
+}
+
+function goToday(){
+  const n=new Date();curY=n.getFullYear();curM=n.getMonth();
+  cfg.year=curY;save();renderMonth();
+}
+
+function switchTab(name){
+  ['monat','jahr','settings'].forEach((t,i)=>{
+    document.getElementById(`tc-${t}`).classList.toggle('active',t===name);
+    document.querySelectorAll('.tab')[i].classList.toggle('active',t===name);
+  });
+  if(name==='jahr')renderYear();
+  if(name==='settings')loadSettingsForm();
+}
+
+function loadSettingsForm(){
+  document.getElementById('s-name').value=cfg.name||'';
+  document.getElementById('s-pnr').value=cfg.pnr||'';
+  document.getElementById('s-dept').value=cfg.dept||'';
+  document.getElementById('s-soll').value=cfg.soll||8;
+  document.getElementById('s-pause').value=cfg.pause||30;
+  document.getElementById('s-url').value=cfg.urlaub||30;
+  document.getElementById('s-url-ue').value=cfg.urlaubUe||0;
+  document.getElementById('s-bl').value=cfg.bundesland||'national';
+  document.getElementById('s-year').value=cfg.year||new Date().getFullYear();
+  document.getElementById('s-contract-start').value=cfg.contractStart||'';
+  document.getElementById('s-start-year-leave').value=cfg.startYearLeave||'';
+  for(let d=0;d<=6;d++)document.getElementById('s-wd-'+d).value=(cfg.weekSoll&&cfg.weekSoll[d]!=null)?cfg.weekSoll[d]:'';
+  document.getElementById('s-vm-arr-dep').value=cfg.vmArrivalDeparture??14;
+  document.getElementById('s-vm-full').value=cfg.vmFull??28;
+  document.getElementById('s-vm-full-fr').value=cfg.vmFullBreakfast??22.4;
+  document.getElementById('s-vm-8h').value=cfg.vm8h??14;
+  document.getElementById('s-km-rate').value=cfg.kmRate??0.30;
+  document.getElementById('s-pause-law').checked=!!cfg.pauseLaw;
+  document.querySelectorAll('#wd-cbg input').forEach(cb=>{
+    const v=parseInt(cb.value),ck=cfg.workdays.includes(v);
+    cb.checked=ck;cb.closest('.dcb').classList.toggle('ck',ck);
+    cb.onchange=()=>cb.closest('.dcb').classList.toggle('ck',cb.checked);
+  });
+}
+
+function saveSettings(){
+  cfg.name=document.getElementById('s-name').value;
+  cfg.pnr=document.getElementById('s-pnr').value;
+  cfg.dept=document.getElementById('s-dept').value;
+  cfg.soll=parseFloat(document.getElementById('s-soll').value)||8;
+  cfg.pause=parseInt(document.getElementById('s-pause').value)||30;
+  cfg.urlaub=parseInt(document.getElementById('s-url').value)||30;
+  cfg.urlaubUe=parseInt(document.getElementById('s-url-ue').value)||0;
+  cfg.bundesland=document.getElementById('s-bl').value;
+  cfg.year=parseInt(document.getElementById('s-year').value)||new Date().getFullYear();
+  cfg.contractStart=document.getElementById('s-contract-start').value||null;
+  cfg.workdays=[];
+  document.querySelectorAll('#wd-cbg input:checked').forEach(cb=>cfg.workdays.push(parseInt(cb.value)));
+  cfg.weekSoll=cfg.weekSoll||{};
+  for(let d=0;d<=6;d++){const v=document.getElementById('s-wd-'+d).value;cfg.weekSoll[d]=v===''?null:parseFloat(v);}
+  cfg.vmArrivalDeparture=parseFloat(document.getElementById('s-vm-arr-dep').value)||0;
+  cfg.vmFull=parseFloat(document.getElementById('s-vm-full').value)||0;
+  cfg.vmFullBreakfast=parseFloat(document.getElementById('s-vm-full-fr').value)||0;
+  cfg.vm8h=parseFloat(document.getElementById('s-vm-8h').value)||0;
+  cfg.kmRate=parseFloat(document.getElementById('s-km-rate').value)||0;
+  cfg.pauseLaw=document.getElementById('s-pause-law').checked;
+  if(cfg.contractStart){
+    const csYear=new Date(cfg.contractStart).getFullYear();
+    if(csYear===cfg.year){cfg.startYearLeave=computeStartYearLeave();document.getElementById('s-start-year-leave').value=cfg.startYearLeave;}
+    else{cfg.startYearLeave=0;document.getElementById('s-start-year-leave').value='';}
+  }else{cfg.startYearLeave=0;document.getElementById('s-start-year-leave').value='';}
+  curY=cfg.year;save();renderMonth();
+  const ok=document.getElementById('saved-ok');
+  ok.style.display='inline';setTimeout(()=>ok.style.display='none',2200);
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify({cfg,data,ts:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`arbeitszeit_${cfg.name||'export'}_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importJSON(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.cfg)cfg=d.cfg;
+      if(d.data)data=d.data;
+      cfg=Object.assign(defCfg(),cfg);
+      save();renderMonth();loadSettingsForm();
+      alert('✓ Daten erfolgreich importiert!');
+    }catch(ex){alert('Fehler: Ungültige oder beschädigte Datei.');}
+  };
+  r.readAsText(f);
+}
+
+function resetAll(){
+  if(confirm('Wirklich ALLE Daten und Einstellungen unwiderruflich löschen?')){
+    localStorage.removeItem('az_cfg');localStorage.removeItem('az_data');
+    load();renderMonth();loadSettingsForm();
+  }
+}
+
+// ── NEU: Beim Schließen/Neuladen des Tabs immer speichern ──
+window.addEventListener('beforeunload', function(){ save(); });
+
+// ════════════════════════════════════════════════════════════════
+//  SHAREPOINT-ANBINDUNG – Ersetzt localStorage save/load/setE
+// ════════════════════════════════════════════════════════════════
+
+// ── 1. KONFIGURATION – hier deine Werte eintragen ──────────────
+const SP_SITE    = 'https://meisterleistung.sharepoint.com/sites/StuttgartMitarbeitende';
+const CLIENT_ID  = '812cc387-bf2e-4a83-a5f2-a5118f78f844';
+const TENANT_ID  = 'c06483b9-fcd1-4dbd-bd29-d79adaaf0a4f';
+const LIST_CFG   = 'AZ_Einstellungen';
+const LIST_TAGE  = 'AZ_Tage';
+
+// ── 2. MSAL-SETUP ───────────────────────────────────────────────
+let msalInstance, currentUser, spSiteId = '';
+
+function initMSAL() {
+  msalInstance = new msal.PublicClientApplication({
+    auth: {
+      clientId: CLIENT_ID,
+      authority: `https://login.microsoftonline.com/${TENANT_ID}`,
+      redirectUri: window.location.href.split('?')[0]
+    },
+    cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
+  });
+}
+
+async function getToken() {
+  const accounts = msalInstance.getAllAccounts();
+  if (!accounts.length) throw new Error('Nicht angemeldet');
+  try {
+    const r = await msalInstance.acquireTokenSilent({
+      scopes: ['Sites.ReadWrite.All', 'User.Read'],
+      account: accounts[0]
+    });
+    return r.accessToken;
+  } catch {
+    const r = await msalInstance.acquireTokenPopup({
+      scopes: ['Sites.ReadWrite.All', 'User.Read']
+    });
+    return r.accessToken;
+  }
+}
+
+async function msalLogin() {
+  document.getElementById('login-error').style.display = 'none';
+  try {
+    const r = await msalInstance.loginPopup({
+      scopes: ['Sites.ReadWrite.All', 'User.Read']
+    });
+    currentUser = r.account;
+    document.getElementById('login-overlay').style.display = 'none';
+    await load();
+    renderMonth();
+  } catch (e) {
+    const el = document.getElementById('login-error');
+    el.textContent = 'Anmeldung fehlgeschlagen: ' + e.message;
+    el.style.display = 'block';
+  }
+}
+
+// ── 3. GRAPH API HILFSFUNKTIONEN ────────────────────────────────
+async function getSiteId() {
+  if (spSiteId) return spSiteId;
+  const u = new URL(SP_SITE);
+  const token = await getToken();
+  const r = await fetch(
+    `https://graph.microsoft.com/v1.0/sites/${u.hostname}:${u.pathname}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  const d = await r.json();
+  spSiteId = d.id;
+  return spSiteId;
+}
+
+async function spGet(list, filter = '') {
+  const sid = await getSiteId();
+  const token = await getToken();
+  let url = `https://graph.microsoft.com/v1.0/sites/${sid}/lists/${list}/items`
+          + `?expand=fields&$top=999`;
+  if (filter) url += `&$filter=${encodeURIComponent(filter)}`;
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (!r.ok) throw new Error(`spGet ${list} → ${r.status}`);
+  const d = await r.json();
+  return d.value.map(i => ({ _spId: i.id, ...i.fields }));
+}
+
+async function spAdd(list, fields) {
+  const sid = await getSiteId();
+  const token = await getToken();
+  const r = await fetch(
+    `https://graph.microsoft.com/v1.0/sites/${sid}/lists/${list}/items`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ fields })
+    }
+  );
+  if (!r.ok) throw new Error(`spAdd ${list} → ${r.status}`);
+  const d = await r.json();
+  return d.id;
+}
+
+async function spPatch(list, itemId, fields) {
+  const sid = await getSiteId();
+  const token = await getToken();
+  const r = await fetch(
+    `https://graph.microsoft.com/v1.0/sites/${sid}/lists/${list}/items/${itemId}/fields`,
+    {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(fields)
+    }
+  );
+  if (!r.ok) throw new Error(`spPatch ${list}/${itemId} → ${r.status}`);
+}
+
+// ── 4. LOAD – ersetzt die bisherige load()-Funktion ─────────────
+async function load() {
+  cfg  = defCfg();
+  data = {};
+  try {
+    // Einstellungen laden
+    const cfgItems = await spGet(
+      LIST_CFG,
+      `fields/Title eq '${currentUser.username}'`
+    );
+    if (cfgItems.length > 0) {
+      const it = cfgItems[0];
+      cfg = Object.assign(defCfg(), {
+        _spId:              it._spId,
+        name:               it.Name               || '',
+        pnr:                it.Personalnummer      || '',
+        dept:               it.Abteilung           || '',
+        contractStart:      it.Vertragsstart       || null,
+        startYearLeave:     it.StartjahrUrlaub     || 0,
+        soll:               it.SollStundenTag      || 8,
+        weekSoll: {
+          0: it.WeekSoll0 ?? null,
+          1: it.WeekSoll1 ?? null,
+          2: it.WeekSoll2 ?? null,
+          3: it.WeekSoll3 ?? null,
+          4: it.WeekSoll4 ?? null,
+          5: it.WeekSoll5 ?? null,
+          6: it.WeekSoll6 ?? null
+        },
+        workdays:           it.Arbeitstage
+                              ? it.Arbeitstage.split(',').map(Number)
+                              : [1,2,3,4,5],
+        pause:              it.StandardPause          || 30,
+        pauseLaw:           it.GesetzlichePause       !== false,
+        urlaub:             it.JahresUrlaub           || 30,
+        urlaubUe:           it.UrlaubUebertrag        || 0,
+        bundesland:         it.Bundesland             || 'national',
+        year:               it.Erfassungsjahr         || new Date().getFullYear(),
+        vmArrivalDeparture: it.VmAnAbreisetag         || 14,
+        vmFull:             it.VmGanzerTag            || 28,
+        vmFullBreakfast:    it.VmGanzerTagFruehstueck || 22.4,
+        vm8h:               it.Vm8hOhneUebernachtung  || 14,
+        kmRate:             it.KmPauschale            || 0.30
+      });
+    }
+
+    // Tagesdaten laden (aktuelles Erfassungsjahr)
+    const year = cfg.year || new Date().getFullYear();
+    const tageItems = await spGet(
+      LIST_TAGE,
+      `fields/MitarbeiterEmail eq '${currentUser.username}' `
+      + `and fields/Jahr eq ${year}`
+    );
+    tageItems.forEach(it => {
+      const key = it.DatumKey;
+      if (!key) return;
+      data[key] = {
+        _spId:     it._spId,
+        type:      it.Tagestyp      || undefined,
+        start:     it.Startzeit     || '',
+        end:       it.Endzeit       || '',
+        pause:     it.PauseMinuten  != null ? it.PauseMinuten : undefined,
+        place:     it.Arbeitsort    || '',
+        pkw:       !!it.PrivaterPKW,
+        km:        it.Kilometer     != null ? it.Kilometer : '',
+        verpfType: it.VerpflegungsTyp || 'none'
+      };
+    });
+  } catch (e) {
+    console.error('load() Fehler:', e);
+  }
+  const n = new Date();
+  curY = cfg.year || n.getFullYear();
+  curM = n.getMonth();
+}
+
+// ── 5. SAVE – ersetzt die bisherige save()-Funktion ─────────────
+//    Wird aufgerufen beim Speichern der Einstellungen und
+//    beim beforeunload-Event (Tab schließen).
+async function save() {
+  if (!currentUser) return;
+  const fields = {
+    Title:                  currentUser.username,
+    Name:                   cfg.name                || '',
+    Personalnummer:         cfg.pnr                 || '',
+    Abteilung:              cfg.dept                || '',
+    Vertragsstart:          cfg.contractStart       || '',
+    StartjahrUrlaub:        cfg.startYearLeave      || 0,
+    SollStundenTag:         cfg.soll                || 8,
+    WeekSoll0:              cfg.weekSoll?.[0]       ?? null,
+    WeekSoll1:              cfg.weekSoll?.[1]       ?? null,
+    WeekSoll2:              cfg.weekSoll?.[2]       ?? null,
+    WeekSoll3:              cfg.weekSoll?.[3]       ?? null,
+    WeekSoll4:              cfg.weekSoll?.[4]       ?? null,
+    WeekSoll5:              cfg.weekSoll?.[5]       ?? null,
+    WeekSoll6:              cfg.weekSoll?.[6]       ?? null,
+    Arbeitstage:            (cfg.workdays || [1,2,3,4,5]).join(','),
+    StandardPause:          cfg.pause               || 30,
+    GesetzlichePause:       !!cfg.pauseLaw,
+    JahresUrlaub:           cfg.urlaub              || 30,
+    UrlaubUebertrag:        cfg.urlaubUe            || 0,
+    Bundesland:             cfg.bundesland          || 'national',
+    Erfassungsjahr:         cfg.year                || new Date().getFullYear(),
+    VmAnAbreisetag:         cfg.vmArrivalDeparture  || 14,
+    VmGanzerTag:            cfg.vmFull              || 28,
+    VmGanzerTagFruehstueck: cfg.vmFullBreakfast     || 22.4,
+    Vm8hOhneUebernachtung:  cfg.vm8h                || 14,
+    KmPauschale:            cfg.kmRate              || 0.30
+  };
+  try {
+    if (cfg._spId) {
+      await spPatch(LIST_CFG, cfg._spId, fields);
+    } else {
+      cfg._spId = await spAdd(LIST_CFG, fields);
+    }
+  } catch (e) {
+    console.error('save() Fehler:', e);
+  }
+}
+
+// ── 6. setE – ersetzt die bisherige setE()-Funktion ─────────────
+//    Wird bei jeder Feldeingabe in der Monatsansicht aufgerufen.
+async function setE(y, m, d, entry) {
+  const key = getKey(y, m, d);
+  data[key] = entry;
+  if (!currentUser) return;
+  const fields = {
+    Title:            key,
+    DatumKey:         key,
+    MitarbeiterEmail: currentUser.username,
+    Jahr:             y,
+    Monat:            m,
+    Tag:              d,
+    Tagestyp:         entry.type      || '',
+    Startzeit:        entry.start     || '',
+    Endzeit:          entry.end       || '',
+    PauseMinuten:     entry.pause     != null ? entry.pause : null,
+    Arbeitsort:       entry.place     || '',
+    PrivaterPKW:      !!entry.pkw,
+    Kilometer:        (entry.km !== '' && entry.km != null)
+                        ? parseFloat(entry.km) : null,
+    VerpflegungsTyp:  entry.verpfType || 'none'
+  };
+  try {
+    if (entry._spId) {
+      await spPatch(LIST_TAGE, entry._spId, fields);
+    } else {
+      data[key]._spId = await spAdd(LIST_TAGE, fields);
+    }
+  } catch (e) {
+    console.error('setE() Fehler:', e);
+  }
+}
+
+// ── 7. AUTOSTART ────────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  initMSAL();
+  // Prüfe ob noch eine gültige Session im Browser vorhanden ist
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length > 0) {
+    try {
+      currentUser = accounts[0];
+      await getToken(); // Token-Test (löst erneuten Login aus, falls abgelaufen)
+      document.getElementById('login-overlay').style.display = 'none';
+      await load();
+      renderMonth();
+    } catch {
+      // Kein gültiges Token → Login-Overlay bleibt sichtbar
+    }
+  }
+});
+
+
+</script>
+
+
+</body></html>
